@@ -7,11 +7,23 @@ var fs = require("fs");
 
 var command = process.argv[2];
 var parameter = process.argv[3];
-// sanitize command with regexp here
+
+var msgBlock = "";
 
 liri(command, parameter);
 
 function liri(command, parameter) {
+
+  // sanitize inputs
+  if(command) {
+    command = command.trim().replace(/[^a-zA-Z \-0-9]+/g, '');
+  }
+  if(parameter) {
+    parameter = parameter.trim().replace(/[^a-zA-Z \-0-9]+/g, '');
+  }
+
+  output(command + " " + (parameter ? parameter : ""));   // log commands to file
+
   switch(command) {
     case "my-tweets":
       getTweets();
@@ -23,7 +35,7 @@ function liri(command, parameter) {
         getSongInfo(song);
       }
       else {
-        console.log("You did not enter a valid song name.  Here's an awesome song instead!");
+        output("You did not enter a valid song name.  Here's an awesome song instead!");
         getSongInfo("The Sign [Remastered]");
       }
       break;
@@ -34,7 +46,7 @@ function liri(command, parameter) {
         getMovieInfo(movie);
       }
       else {
-        console.log("You did not enter a valid movie name.  Here's an awesome movie instead!");
+        output("You did not enter a valid movie name.  Here's an awesome movie instead!");
         getMovieInfo("Mr. Nobody");
       }
       break;
@@ -44,14 +56,15 @@ function liri(command, parameter) {
       break;
 
     default:
-      console.log("Sorry, I didn't understand that command.");
+      output("Sorry, I didn't understand that command.\n");
+      log(msgBlock);
   }
 }
 
 // Displays last 20 tweets and their date/time in the console.
 function getTweets() {
 
-  console.log("Loading Twitter...");
+  output("Loading Twitter...");
 
   var twitter = new Twitter({
     consumer_key: keys.twitterKeys.consumer_key,
@@ -65,15 +78,17 @@ function getTweets() {
   twitter.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error && tweets.length > 0) {
 
-      console.log("Here are the recent tweets of user " + tweets[0].user.screen_name + ":");
+      output("Here are the recent tweets of user " + tweets[0].user.screen_name + ":");
       for(var i = 0; i < tweets.length && i < 20; i++) {
-        console.log(tweets[i].text);
-        console.log(tweets[i].created_at);
+        output(tweets[i].text);
+        output(tweets[i].created_at);
       }
+      output("\n");
+      log(msgBlock);
     }
     else {
-      console.log("Sorry.  There was a problem retrieving the tweets.  Try buying some birdseed next time.");
-      // write error message to file
+      output("Sorry.  There was a problem retrieving the tweets.  Try buying some birdseed next time.\n");
+      log(msgBlock);
     }
   });
 }
@@ -81,7 +96,7 @@ function getTweets() {
 // Displays artist(s), song name, spotify preview link, and album name
 function getSongInfo(song) {
 
-  console.log("Loading Spotify...");
+  output("Loading Spotify...");
 
   var spotify = new Spotify({
     id: keys.spotifyKeys.client_id,
@@ -104,15 +119,17 @@ function getSongInfo(song) {
           artistString += ", ";
         }
       }
-      console.log("Artist(s): " + artistString);
-      console.log("Song: " + firstResult.name);
+      output("Artist(s): " + artistString);
+      output("Song: " + firstResult.name);
       // Show either preview link, or regular spotify link if there's no preview (fairly common)
-      console.log("Preview link: " + (firstResult.preview_url ? firstResult.preview_url : firstResult.external_urls.spotify));
-      console.log("Album: " + firstResult.album.name);
+      output("Preview link: " + (firstResult.preview_url ? firstResult.preview_url : firstResult.external_urls.spotify));
+      output("Album: " + firstResult.album.name);
+      output("\n");
+      log(msgBlock);
     }
     else {
-      console.log("Sorry.  We couldn't find that song.  Are you sure it actually exists?");
-      // write error message to file
+      output("Sorry.  We couldn't find that song.  Are you sure it actually exists?\n");
+      log(msgBlock);
     }
 
   });
@@ -121,7 +138,7 @@ function getSongInfo(song) {
 // Returns movie info from omdbAPI
 function getMovieInfo(movieTitle) {
 
-  console.log("Fetching movie info...");
+  output("Fetching movie info...");
 
   var queryURL = "https://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&apikey=" + keys.omdbKey;
 
@@ -132,27 +149,31 @@ function getMovieInfo(movieTitle) {
 
       if(movie.Response === "True") {
         // There was a movie with that name found
-        console.log("Title: " + movie.Title);
-        console.log("Year: " + movie.Year);
+        output("Title: " + movie.Title);
+        output("Year: " + movie.Year);
         // Just in case a movie doesn't have a rating (can that happen?)
         if(movie.Ratings.length > 0) {
-          console.log("IMDB Rating: " + movie.Ratings[0].Value);
+          output("IMDB Rating: " + movie.Ratings[0].Value);
         }
         if(movie.Ratings.length > 1) {
-          console.log("Rotten Tomatoes Rating: " + movie.Ratings[1].Value);
+          output("Rotten Tomatoes Rating: " + movie.Ratings[1].Value);
         }
-        console.log("Country: " + movie.Country);
-        console.log("Language: " + movie.Language);
-        console.log("Plot: " + movie.Plot);
-        console.log("Actors: " + movie.Actors);
+        output("Country: " + movie.Country);
+        output("Language: " + movie.Language);
+        output("Plot: " + movie.Plot);
+        output("Actors: " + movie.Actors);
+        output("\n");
+        log(msgBlock);
       }
       else {
-        console.log("Oops.  We couldn't find a movie with that name.  Try something else?");
+        output("Oops.  We couldn't find a movie with that name.  Try something else?\n");
+        log(msgBlock);
         return;
       }
     }
     else {
-      console.log("Something went wrong when looking for your movie.  Try again?");
+      output("Something went wrong when looking for your movie.  Try again?\n");
+      log(msgBlock);
     }
   });
 }
@@ -162,17 +183,32 @@ function doTheThing() {
 
   fs.readFile("random.txt", "utf8", function(error, data) {
     if(error) {
-      return console.log(error);
+      return output(error);
     }
 
     var instructions = data.split(",");
 
     if(instructions[0] === "do-what-it-says") {
-      console.log("Oh no you don't!  Bad kitty!  Infinite loops are not toys!")
+      output("Oh no you don't!  Bad kitty!  Infinite loops are not toys!\n")
     }
-    else {
+    else {  // call liri with sanitized inputs
       liri(instructions[0], instructions[1]);
     }
   });
+}
 
+// Log to console and buffer
+function output(msg) {
+  console.log(msg);
+  msgBlock += msg + "\n";    // Buffer messages so we don't run into asynchronous write issues
+}
+
+// Log to file
+function log(msg) {
+
+  fs.appendFile("log.txt", msg, function(err) {
+    if(err) {
+      return console.log(err);
+    }
+  });
 }
