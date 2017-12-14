@@ -1,0 +1,32 @@
+{
+  "name": "liri-node-app",
+  "version": "1.0.0",
+  "description": "Command line interface for twitter and spotify APIs",
+  "main": "liri.js",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "node-spotify-api": "^1.0.7",
+    "request": "^2.83.0",
+    "twitter": "^1.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArmandFrvr/liri-node-app.git"
+  },
+  "keywords": [
+    "twitter",
+    "spotify",
+    "api",
+    "node"
+  ],
+  "author": "Alwyn Durham",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArmandFrvr/liri-node-app/issues"
+  },
+  "homepage": "https://github.com/ArmandFrvr/liri-node-app#readme"
+}
