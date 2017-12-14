@@ -4,7 +4,8 @@ var twitterKeys = {
   consumer_key: "iOYwkuXYRqm8d37Reu58DwjOr",
   consumer_secret: "IBtn1GVYKtDdOrayPiIlqwOLO8HIqw3psl3GETyHB0wWftpL6E",
   access_token_key: "940314665774604288-7wP0L1Dj9AmcWjL3bGo9Qg0kG6zRVoG",
-  access_token_secret: "FpAYGgIxil54aXhIAw41ia6cWaKw9Pr7gSr7ZjPifMWTs"
+  access_token_secret: "FpAYGgIxil54aXhIAw41ia6cWaKw9Pr7gSr7ZjPifMWTs",
+  screen_name: "ArmandFrvr"
 }
 
 var spotifyKeys = {

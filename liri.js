@@ -6,42 +6,46 @@ var Spotify = require("node-spotify-api");
 var fs = require("fs");
 
 var command = process.argv[2];
+var parameter = process.argv[3];
 // sanitize command with regexp here
 
+liri(command, parameter);
 
-switch(command) {
-  case "my-tweets":
-    getTweets();
-    break;
+function liri(command, parameter) {
+  switch(command) {
+    case "my-tweets":
+      getTweets();
+      break;
 
-  case "spotify-this-song":
-    var song = process.argv[3];     // need to sanitize
-    if(!!song) {
-      getSongInfo(song);
-    }
-    else {
-      console.log("You did not enter a valid song name.  Here's an awesome song instead!");
-      getSongInfo("The Sign");
-    }
-    break;
+    case "spotify-this-song":
+      var song = parameter;     // need to sanitize
+      if(!!song) {
+        getSongInfo(song);
+      }
+      else {
+        console.log("You did not enter a valid song name.  Here's an awesome song instead!");
+        getSongInfo("The Sign [Remastered]");
+      }
+      break;
 
-  case "movie-this":
-    var movie = process.argv[3];    // need to sanitize
-    if(!!movie) {
-      getMovieInfo(movie);
-    }
-    else {
-      console.log("You did not enter a valid movie name.  Here's an awesome movie instead!");
-      getMovieInfo("Mr. Nobody");
-    }
-    break;
+    case "movie-this":
+      var movie = parameter;    // need to sanitize
+      if(!!movie) {
+        getMovieInfo(movie);
+      }
+      else {
+        console.log("You did not enter a valid movie name.  Here's an awesome movie instead!");
+        getMovieInfo("Mr. Nobody");
+      }
+      break;
 
-  case "do-what-it-says":
-    doTheThing();
-    break;
+    case "do-what-it-says":
+      doTheThing();
+      break;
 
-  default:
-    console.log("Sorry, I didn't understand that command.");
+    default:
+      console.log("Sorry, I didn't understand that command.");
+  }
 }
 
 // Displays last 20 tweets and their date/time in the console.
@@ -56,7 +60,7 @@ function getTweets() {
     access_token_secret: keys.twitterKeys.access_token_secret
   });
 
-  var params = {screen_name: 'ArmandFrvr'};
+  var params = {screen_name: keys.twitterKeys.screen_name};
 
   twitter.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error && tweets.length > 0) {
@@ -155,5 +159,20 @@ function getMovieInfo(movieTitle) {
 
 // Do whatever the file says to do and hope it doesn't blow up Alderaan
 function doTheThing() {
+
+  fs.readFile("random.txt", "utf8", function(error, data) {
+    if(error) {
+      return console.log(error);
+    }
+
+    var instructions = data.split(",");
+
+    if(instructions[0] === "do-what-it-says") {
+      console.log("Oh no you don't!  Bad kitty!  Infinite loops are not toys!")
+    }
+    else {
+      liri(instructions[0], instructions[1]);
+    }
+  });
 
 }
